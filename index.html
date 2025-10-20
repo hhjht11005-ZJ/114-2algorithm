@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>演算法特務學院 (v3 - 暫停/積木版)</title>
+    <title>演算法特務學院 (v4 - 暫停修復/更多範例)</title>
     <style>
         /* --- 全局樣式 --- */
         body {
@@ -84,22 +84,25 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             margin: 5px; /* 增加間距 */
         }
-        .btn:hover {
+        .btn:hover:not(:disabled) {
             background-color: #357ABD;
             transform: translateY(-2px);
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
+        .btn:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
         .btn-next { background-color: #4CAF50; }
-        .btn-next:hover { background-color: #43a047; }
+        .btn-next:hover:not(:disabled) { background-color: #43a047; }
         .btn-check { background-color: #f39c12; }
-        .btn-check:hover { background-color: #e67e22; }
+        .btn-check:hover:not(:disabled) { background-color: #e67e22; }
         .btn-reset { background-color: #e74c3c; }
-        .btn-reset:hover { background-color: #c0392b; }
+        .btn-reset:hover:not(:disabled) { background-color: #c0392b; }
         .btn-hint { background-color: #9b59b6; }
-        .btn-hint:hover { background-color: #8e44ad; }
-        /* [新增] 暫停按鈕樣式 */
+        .btn-hint:hover:not(:disabled) { background-color: #8e44ad; }
         .btn-pause { background-color: #3498db; }
-        .btn-pause:hover { background-color: #2980b9; }
+        .btn-pause:hover:not(:disabled) { background-color: #2980b9; }
 
         /* --- 任務1：拖曳排序 --- */
         #drop-zone {
@@ -181,7 +184,7 @@
             opacity: 0.6;
         }
 
-        /* --- [重大更新] Scratch 積木樣式 --- */
+        /* --- [v4 確認] Scratch 積木樣式 --- */
         .scratch-puzzle-container {
             background: #f0f0f0;
             border: 1px solid #ddd;
@@ -223,13 +226,6 @@
             border: 2px solid #4a90e2;
             border-radius: 5px;
             margin: 0 5px;
-        }
-        .scratch-block-container {
-            background-color: #f9f9f9;
-            border: 1px dashed #ccc;
-            border-radius: 8px;
-            padding: 10px;
-            margin-top: 10px;
         }
         
         /* --- 結果提示 --- */
@@ -310,12 +306,13 @@
             </p>
 
             <h3>任務 2-1: 排序法演示</h3>
-            <p><strong>📖 任務說明：</strong> 觀察「選擇排序法」如何處理這組密碼：[ 8, 5, 10, 1, 7 ]。它會一輪一輪地找出「未排序」中最小的數字，放到「已排序」的末端。</p>
+            <p id="m2-task-desc"><strong>📖 任務說明：</strong> 觀察「選擇排序法」如何處理這組密碼：[ 8, 5, 10, 1, 7 ]。它會一輪一輪地找出「未排序」中最小的數字，放到「已排序」的末端。</p>
             <div id="m2-viz-container" class="data-container">
                 </div>
-            <button class="btn" onclick="m2_startVisualization()">開始演示 ▶️</button>
+            <button class="btn" id="btn-m2-start" onclick="m2_startVisualization()">開始演示 ▶️</button>
             <button class="btn btn-pause" id="btn-m2-pause" onclick="m2_togglePause()" disabled>暫停 ⏸️</button>
-            <button class="btn btn-reset" onclick="m2_resetVisualization()">重新演示 🔄</button>
+            <button class="btn btn-hint" id="btn-m2-new-example" onclick="m2_generate_new_example()">換一組數字 🎲</button>
+
 
             <h3 style="margin-top: 30px;">任務 2-2: 修復 Scratch 程式</h3>
             <p><strong>📖 任務說明：</strong> 這是「選擇排序法」中「找出最小值位置」的關鍵程式。但它好像壞了！請找出 <strong>(?)</strong> 應該填入什麼？</p>
@@ -371,21 +368,26 @@
             </p>
 
             <h3>任務 3-1: 循序搜尋法</h3>
-            <p><strong>📖 任務說明：</strong> 在這堆 <strong>未排序</strong> 的彈藥箱 [ 8, 5, 10, 1, 7 ] 中，找出 <strong>10號</strong> 彈藥。你必須 *從左到右* 依序點擊檢查！</p>
+            <p id="m3-seq-task-desc"><strong>📖 任務說明：</strong> ...</p>
             <div id="m3-seq-container" class="data-container">
                 </div>
             <p>你已比較了 <strong id="m3-seq-count">0</strong> 次。</p>
-            <button class="btn btn-reset" onclick="m3_resetSequential()">重設任務</button>
+            <button class="btn btn-reset" onclick="m3_resetSequential()">重設此任務</button>
             <div id="m3-seq-feedback" class="feedback"></div>
 
             <h3 style="margin-top: 30px;">任務 3-2: 二元搜尋法</h3>
-            <p><strong>📖 任務說明：</strong> 這次彈藥箱 <strong>已排序</strong> [ 1, 5, 7, 8, 10 ]。我們要找出 <strong>10號</strong> 彈藥。請跟隨系統的提示，使用「二元搜尋法」（折半搜尋）！</p>
+            <p id="m3-bin-task-desc"><strong>📖 任務說明：</strong> ...</p>
             <div id="m3-bin-container" class="data-container">
                 </div>
             <div id="m3-bin-guide">
                 </div>
-            <button class="btn btn-reset" onclick="m3_resetBinary()">重設任務</button>
+            <button class="btn btn-reset" onclick="m3_resetBinary()">重設此任務</button>
             <div id="m3-bin-feedback" class="feedback"></div>
+            
+            <hr style="margin-top: 30px;">
+            <div style="text-align: center;">
+                <button class="btn btn-hint" id="btn-m3-new-example" onclick="m3_generate_new_example()">換個新任務 🎲</button>
+            </div>
             
             <button class="btn btn-next" onclick="showMission('mission-4')" style="display:none;" id="btn-m3-next">前往最終試煉 ➡️</button>
         </section>
@@ -426,11 +428,26 @@
     </main>
 
     <footer>
-        <p>「演算法特務學院」 - 數位學習模組 Demo (v3)<br>
+        <p>「演算法特務學院」 - 數位學習模組 Demo (v4)<br>
         靈感來源：翰林版八年級資訊科技 (108課綱) 第六章</p>
     </footer>
 
     <script>
+        // --- 全局工具 ---
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // [v4 新增] 隨機陣列產生器
+        function generateRandomArray(size = 5, min = 1, max = 20) {
+            let arr = [];
+            let s = new Set();
+            while(s.size < size) {
+                s.add(Math.floor(Math.random() * (max - min + 1)) + min);
+            }
+            return Array.from(s);
+        }
+        
         // --- 全局導航 ---
         function showMission(missionId) {
             // 隱藏所有任務
@@ -470,9 +487,7 @@
             document.getElementById('btn-m1-next').style.display = 'none';
         }
 
-        function m1_handleDragStart(e) {
-            m1_draggedItem = e.target;
-        }
+        function m1_handleDragStart(e) { m1_draggedItem = e.target; }
 
         function m1_handleDrop(e) {
             e.preventDefault();
@@ -539,35 +554,37 @@
             }
         }
 
-        // --- 任務 2: 選擇排序法 (含暫停功能) ---
+        // --- 任務 2: 選擇排序法 (v4 暫停修復 / 更多範例) ---
         let m2_data = [8, 5, 10, 1, 7];
         let m2_viz_container = document.getElementById('m2-viz-container');
         let m2_isPaused = false;
         let m2_pausePromiseResolver = null;
         let m2_isRunning = false;
 
-        // [新增] 可暫停的 sleep 函式
-        function m2_pausableSleep(ms) {
-            return new Promise(resolve => {
-                setTimeout(() => {
-                    if (m2_isPaused) {
-                        m2_pausePromiseResolver = resolve;
-                    } else {
-                        resolve();
-                    }
-                }, ms);
-            });
+        // [v4 修復] 可暫停的 sleep 函式
+        async function m2_pausableSleep(ms) {
+            await sleep(ms); // 正常的延遲
+            if (m2_isPaused) {
+                // 如果是暫停狀態，建立一個 Promise 並等待它被 resolve
+                await new Promise(resolve => {
+                    m2_pausePromiseResolver = resolve;
+                });
+            }
         }
 
-        // [新增] 暫停/繼續 切換
+        // [v4 修復] 暫停/繼續 切換
         function m2_togglePause() {
+            if (!m2_isRunning) return; // 沒在跑，按了也沒用
+            
             m2_isPaused = !m2_isPaused;
             const pauseBtn = document.getElementById('btn-m2-pause');
+            
             if (m2_isPaused) {
                 pauseBtn.textContent = '繼續 ▶️';
             } else {
                 pauseBtn.textContent = '暫停 ⏸️';
                 if (m2_pausePromiseResolver) {
+                    // 如果 m2_pausableSleep 正在等待，就呼叫它的 resolve() 讓它繼續
                     m2_pausePromiseResolver();
                     m2_pausePromiseResolver = null;
                 }
@@ -575,12 +592,27 @@
         }
 
         function m2_init() {
-            m2_resetVisualization();
+            m2_generate_new_example(true); // 初始載入預設範例
             document.getElementById('m2-feedback').style.display = 'none';
             document.getElementById('btn-m2-next').style.display = 'none';
             document.getElementById('m2-quiz-select').value = '';
         }
 
+        // [v4 新增] 產生新範例
+        function m2_generate_new_example(isDefault = false) {
+            if (m2_isRunning) return; // 動畫中，不給換
+            
+            if (isDefault) {
+                m2_data = [8, 5, 10, 1, 7];
+            } else {
+                m2_data = generateRandomArray(5, 1, 20);
+            }
+            
+            document.getElementById('m2-task-desc').innerHTML = `<strong>📖 任務說明：</strong> 觀察「選擇排序法」如何處理這組密碼：[ ${m2_data.join(', ')} ]。它會一輪一輪地找出「未排序」中最小的數字，放到「已排序」的末端。`;
+            m2_resetVisualization();
+        }
+        
+        // m2_resetVisualization 只負責繪製當前的 m2_data
         function m2_resetVisualization() {
             m2_viz_container.innerHTML = '';
             m2_data.forEach(val => {
@@ -589,63 +621,79 @@
                 box.textContent = val;
                 m2_viz_container.appendChild(box);
             });
-            // 重置暫停狀態
+            // 重置狀態
             m2_isRunning = false;
             m2_isPaused = false;
-            if (m2_pausePromiseResolver) { // 如果在暫停時重設，要解除 promise
+            if (m2_pausePromiseResolver) {
                 m2_pausePromiseResolver();
                 m2_pausePromiseResolver = null;
             }
             document.getElementById('btn-m2-pause').textContent = '暫停 ⏸️';
             document.getElementById('btn-m2-pause').disabled = true;
+            document.getElementById('btn-m2-start').disabled = false;
+            document.getElementById('btn-m2-new-example').disabled = false;
         }
         
-        // [修改] 演示函式
         async function m2_startVisualization() {
             if (m2_isRunning) return; // 防止重複執行
             m2_isRunning = true;
             document.getElementById('btn-m2-pause').disabled = false;
+            document.getElementById('btn-m2-start').disabled = true;
+            document.getElementById('btn-m2-new-example').disabled = true;
             
-            m2_resetVisualization();
+            // 重新繪製，確保是乾淨的狀態
+            m2_viz_container.innerHTML = '';
+            m2_data.forEach(val => {
+                let box = document.createElement('div');
+                box.className = 'data-box';
+                box.textContent = val;
+                m2_viz_container.appendChild(box);
+            });
             let boxes = m2_viz_container.querySelectorAll('.data-box');
             let n = boxes.length;
 
-            for (let i = 0; i < n - 1; i++) {
-                let minIdx = i;
-                boxes[i].classList.add('highlight-swap'); // 標記當前比較的基準
-                await m2_pausableSleep(800);
+            try {
+                for (let i = 0; i < n - 1; i++) {
+                    let minIdx = i;
+                    boxes[i].classList.add('highlight-swap'); // 標記當前比較的基準
+                    await m2_pausableSleep(800);
 
-                // 找到未排序部分中的最小值
-                for (let j = i + 1; j < n; j++) {
-                    boxes[j].classList.add('highlight-min'); // 標記正在檢查的
-                    await m2_pausableSleep(500);
-                    if (parseInt(boxes[j].textContent) < parseInt(boxes[minIdx].textContent)) {
-                        boxes[minIdx].classList.remove('highlight-min', 'highlight-swap');
-                        minIdx = j;
-                        boxes[minIdx].classList.add('highlight-min'); // 標記新的最小值
-                    } else {
-                        boxes[j].classList.remove('highlight-min');
+                    // 找到未排序部分中的最小值
+                    for (let j = i + 1; j < n; j++) {
+                        boxes[j].classList.add('highlight-min'); // 標記正在檢查的
+                        await m2_pausableSleep(500);
+                        if (parseInt(boxes[j].textContent) < parseInt(boxes[minIdx].textContent)) {
+                            boxes[minIdx].classList.remove('highlight-min', 'highlight-swap');
+                            minIdx = j;
+                            boxes[minIdx].classList.add('highlight-min'); // 標記新的最小值
+                        } else {
+                            boxes[j].classList.remove('highlight-min');
+                        }
                     }
+                    
+                    await m2_pausableSleep(800);
+
+                    // 交換
+                    let temp = boxes[i].textContent;
+                    boxes[i].textContent = boxes[minIdx].textContent;
+                    boxes[minIdx].textContent = temp;
+
+                    // 清除樣式
+                    boxes.forEach(box => box.classList.remove('highlight-min', 'highlight-swap'));
+                    boxes[i].classList.add('sorted'); // 標記已排序
                 }
-                
-                await m2_pausableSleep(800);
-
-                // 交換
-                let temp = boxes[i].textContent;
-                boxes[i].textContent = boxes[minIdx].textContent;
-                boxes[minIdx].textContent = temp;
-
-                // 清除樣式
-                boxes.forEach(box => box.classList.remove('highlight-min', 'highlight-swap'));
-                boxes[i].classList.add('sorted'); // 標記已排序
+                boxes[n - 1].classList.add('sorted');
+            } catch (e) {
+                console.error("Animation stopped:", e);
+            } finally {
+                // 演示結束
+                m2_isRunning = false;
+                m2_isPaused = false;
+                document.getElementById('btn-m2-pause').textContent = '暫停 ⏸️';
+                document.getElementById('btn-m2-pause').disabled = true;
+                document.getElementById('btn-m2-start').disabled = false;
+                document.getElementById('btn-m2-new-example').disabled = false;
             }
-            boxes[n - 1].classList.add('sorted');
-            
-            // 演示結束
-            m2_isRunning = false;
-            m2_isPaused = false;
-            document.getElementById('btn-m2-pause').textContent = '暫停 ⏸️';
-            document.getElementById('btn-m2-pause').disabled = true;
         }
 
         function m2_checkQuiz() {
@@ -669,15 +717,44 @@
             feedback.style.display = 'block';
         }
 
-        // --- 任務 3: 搜尋 ---
-        let m3_seq_data = [8, 5, 10, 1, 7];
-        let m3_seq_target = 10;
+        // --- 任務 3: 搜尋 (v4 更多範例) ---
+        let m3_seq_data = [];
+        let m3_seq_target = 0;
         let m3_seq_count = 0;
         let m3_seq_found = false;
-        let m3_bin_data = [1, 5, 7, 8, 10];
-        let m3_bin_target = 10;
+
+        let m3_bin_data = [];
+        let m3_bin_target = 0;
         
         function m3_init() {
+            m3_generate_new_example(true); // 載入第一個範例
+            document.getElementById('btn-m3-next').style.display = 'none';
+        }
+
+        // [v4 新增] 產生新範例
+        function m3_generate_new_example(isDefault = false) {
+            if (isDefault) {
+                // 循序
+                m3_seq_data = [8, 5, 10, 1, 7];
+                m3_seq_target = 10;
+                // 二元
+                m3_bin_data = [1, 5, 7, 8, 10];
+                m3_bin_target = 10;
+            } else {
+                // 循序
+                m3_seq_data = generateRandomArray(5, 1, 20);
+                m3_seq_target = m3_seq_data[Math.floor(Math.random() * m3_seq_data.length)]; // 確保目標存在
+                // 二元
+                let temp_bin = generateRandomArray(5, 1, 20);
+                m3_bin_data = [...temp_bin].sort((a,b) => a-b);
+                m3_bin_target = m3_bin_data[Math.floor(Math.random() * m3_bin_data.length)]; // 確保目標存在
+            }
+
+            // 更新任務說明
+            document.getElementById('m3-seq-task-desc').innerHTML = `<strong>📖 任務說明：</strong> 在這堆 <strong>未排序</strong> 的彈藥箱 [ ${m3_seq_data.join(', ')} ] 中，找出 <strong>${m3_seq_target}號</strong> 彈藥。你必須 *從左到右* 依序點擊檢查！`;
+            document.getElementById('m3-bin-task-desc').innerHTML = `<strong>📖 任務說明：</strong> 這次彈藥箱 <strong>已排序</strong> [ ${m3_bin_data.join(', ')} ]。我們要找出 <strong>${m3_bin_target}號</strong> 彈藥。請跟隨系統的提示！`;
+
+            // 重設兩個任務
             m3_resetSequential();
             m3_resetBinary();
             document.getElementById('btn-m3-next').style.display = 'none';
@@ -721,7 +798,10 @@
                 feedback.textContent = `🎉 找到了！目標是 ${val}。你總共比較了 ${m3_seq_count} 次。`;
                 feedback.className = 'feedback success';
                 box.classList.add('sorted');
-                document.getElementById('btn-m3-next').style.display = 'inline-block';
+                // 檢查是否兩個任務都完成了
+                if (document.getElementById('m3-bin-feedback').classList.contains('success')) {
+                    document.getElementById('btn-m3-next').style.display = 'inline-block';
+                }
             } else {
                 feedback.textContent = `第 ${m3_seq_count} 次： ${val} 不是目標... 繼續找下一個。`;
                 feedback.className = 'feedback hint'; 
@@ -740,6 +820,7 @@
                 container.appendChild(box);
             });
             document.getElementById('m3-bin-feedback').style.display = 'none';
+            document.getElementById('m3-bin-feedback').classList.remove('success');
             m3_startBinarySearch(0, m3_bin_data.length - 1, 0); 
         }
 
@@ -802,11 +883,15 @@
             feedback.style.display = 'none'; 
 
             if (choice === 'equal') {
-                feedback.textContent = `🎉 找到了！目標就是 ${midVal}！總共比較了 ${count} 次。比循序搜尋快多了！`;
-                feedback.className = 'feedback success';
+                feedback.textContent = `🎉 找到了！目標就是 ${midVal}！總共比較了 ${count} 次。`;
+                feedback.className = 'feedback success'; // 標記成功
                 feedback.style.display = 'block';
                 boxes[mid].classList.add('sorted');
                 document.getElementById('m3-bin-guide').innerHTML = '';
+                // 檢查是否兩個任務都完成了
+                if (m3_seq_found) {
+                    document.getElementById('btn-m3-next').style.display = 'inline-block';
+                }
             } else if (choice === 'less') {
                 m3_startBinarySearch(low, mid - 1, count); 
             } else if (choice === 'more') {
@@ -815,9 +900,9 @@
         }
 
         // --- 任務 4: 最終試煉 ---
-        let m4_data = [42, 15, 7, 99, 30];
+        let m4_data = [];
         let m4_sorted_data = [];
-        let m4_target = 30; 
+        let m4_target = 0; 
         
         function m4_init() {
             const pool = document.getElementById('m4-sort-pool');
@@ -826,7 +911,7 @@
             result.innerHTML = '';
             m4_sorted_data = [];
             
-            m4_data = Array.from({length: 5}, () => Math.floor(Math.random() * 100) + 1);
+            m4_data = generateRandomArray(5, 1, 100);
             m4_target = m4_data[Math.floor(Math.random() * m4_data.length)]; 
             
             m4_data.forEach(val => {
