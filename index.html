@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>演算法特務學院 (v2 - 支援版)</title>
+    <title>演算法特務學院 (v3 - 暫停/積木版)</title>
     <style>
         /* --- 全局樣式 --- */
         body {
@@ -24,23 +24,11 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             border-bottom: 5px solid #43a047;
         }
-        header h1 {
-            margin: 0;
-            font-size: 2.5rem;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
-        }
-        header p {
-            margin: 5px 0 0;
-            font-size: 1.2rem;
-            opacity: 0.9;
-        }
+        header h1 { margin: 0; font-size: 2.5rem; text-shadow: 1px 1px 3px rgba(0,0,0,0.2); }
+        header p { margin: 5px 0 0; font-size: 1.2rem; opacity: 0.9; }
 
         /* --- 主內容區 --- */
-        main {
-            max-width: 900px;
-            margin: 30px auto;
-            padding: 20px;
-        }
+        main { max-width: 900px; margin: 30px auto; padding: 20px; }
 
         /* --- 任務卡片樣式 --- */
         .mission {
@@ -53,12 +41,10 @@
             display: none; /* 預設隱藏所有任務 */
             animation: fadeIn 0.5s ease-in-out;
         }
-
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
         .mission h2 {
             color: #4a90e2;
             border-bottom: 2px solid #f0f4f8;
@@ -75,7 +61,6 @@
             padding: 3px 8px;
             border-radius: 5px;
         }
-
         .mission-intro {
             font-size: 1.1rem;
             background: #f9f9f9;
@@ -104,32 +89,17 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
-        .btn-next {
-            background-color: #4CAF50; /* 綠色 */
-        }
-        .btn-next:hover {
-            background-color: #43a047;
-        }
-        .btn-check {
-            background-color: #f39c12; /* 橘色 */
-        }
-        .btn-check:hover {
-            background-color: #e67e22;
-        }
-        .btn-reset {
-            background-color: #e74c3c; /* 紅色 */
-        }
-        .btn-reset:hover {
-            background-color: #c0392b;
-        }
-        /* [新增] 提示按鈕樣式 */
-        .btn-hint {
-            background-color: #9b59b6; /* 紫色 */
-        }
-        .btn-hint:hover {
-            background-color: #8e44ad;
-        }
-
+        .btn-next { background-color: #4CAF50; }
+        .btn-next:hover { background-color: #43a047; }
+        .btn-check { background-color: #f39c12; }
+        .btn-check:hover { background-color: #e67e22; }
+        .btn-reset { background-color: #e74c3c; }
+        .btn-reset:hover { background-color: #c0392b; }
+        .btn-hint { background-color: #9b59b6; }
+        .btn-hint:hover { background-color: #8e44ad; }
+        /* [新增] 暫停按鈕樣式 */
+        .btn-pause { background-color: #3498db; }
+        .btn-pause:hover { background-color: #2980b9; }
 
         /* --- 任務1：拖曳排序 --- */
         #drop-zone {
@@ -158,6 +128,12 @@
             background: #f0f4f8;
             padding: 10px;
             border-radius: 8px;
+        }
+        .drag-item.hint-glow { animation: glow 1.5s infinite; }
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px #9b59b6; }
+            50% { box-shadow: 0 0 20px #9b59b6; }
+            100% { box-shadow: 0 0 5px #9b59b6; }
         }
 
         /* --- 任務2 & 3：視覺化方塊 --- */
@@ -197,42 +173,63 @@
             color: white;
             border-color: #43a047;
         }
-        .data-box.search-target {
-            cursor: pointer;
-        }
-         .data-box.search-target:hover {
-            transform: scale(1.1);
-        }
+        .data-box.search-target { cursor: pointer; }
+        .data-box.search-target:hover { transform: scale(1.1); }
         .data-box.disabled {
             background: #f5f5f5;
             color: #bbb;
             opacity: 0.6;
         }
-        /* [新增] 提示方塊樣式 (任務1) */
-        .drag-item.hint-glow {
-            animation: glow 1.5s infinite;
-        }
-        @keyframes glow {
-            0% { box-shadow: 0 0 5px #9b59b6; }
-            50% { box-shadow: 0 0 20px #9b59b6; }
-            100% { box-shadow: 0 0 5px #9b59b6; }
-        }
 
-        /* --- Scratch 拼圖 --- */
-        .scratch-puzzle {
-            background: #f9f9f9;
+        /* --- [重大更新] Scratch 積木樣式 --- */
+        .scratch-puzzle-container {
+            background: #f0f0f0;
             border: 1px solid #ddd;
             border-radius: 8px;
             padding: 20px;
             margin-top: 20px;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 1.1rem;
         }
-        .scratch-puzzle select {
+        .scratch-stack {
+            padding-left: 20px; /* 模擬堆疊縮排 */
+        }
+        .scratch-block {
+            padding: 8px 12px;
+            color: white;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            display: inline-block; /* 讓積木寬度自適應 */
+            min-width: 40px;
+            text-align: center;
+        }
+        .scratch-block-control { background-color: #ffab19; } /* 控制 (橘色) */
+        .scratch-block-data { background-color: #ff8c1a; } /* 變數 (深橘) */
+        .scratch-block-operator { background-color: #59c059; } /* 運算 (綠色) */
+        
+        .scratch-inline-input {
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 15px;
+            padding: 2px 8px;
+            color: black;
+            font-weight: normal;
+            display: inline-block;
+            min-width: 30px;
+        }
+        .scratch-quiz-select {
             font-size: 1rem;
             padding: 5px;
             border: 2px solid #4a90e2;
             border-radius: 5px;
+            margin: 0 5px;
+        }
+        .scratch-block-container {
+            background-color: #f9f9f9;
+            border: 1px dashed #ccc;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 10px;
         }
         
         /* --- 結果提示 --- */
@@ -254,7 +251,6 @@
             color: #a94442;
             border: 1px solid #ebccd1;
         }
-        /* [新增] 提示訊息樣式 */
         .feedback.hint {
             background: #fcf8e3;
             color: #8a6d3b;
@@ -317,30 +313,49 @@
             <p><strong>📖 任務說明：</strong> 觀察「選擇排序法」如何處理這組密碼：[ 8, 5, 10, 1, 7 ]。它會一輪一輪地找出「未排序」中最小的數字，放到「已排序」的末端。</p>
             <div id="m2-viz-container" class="data-container">
                 </div>
-            <button class="btn" onclick="m2_startVisualization()">開始演示</button>
-            <button class="btn btn-reset" onclick="m2_resetVisualization()">重新演示</button>
+            <button class="btn" onclick="m2_startVisualization()">開始演示 ▶️</button>
+            <button class="btn btn-pause" id="btn-m2-pause" onclick="m2_togglePause()" disabled>暫停 ⏸️</button>
+            <button class="btn btn-reset" onclick="m2_resetVisualization()">重新演示 🔄</button>
 
             <h3 style="margin-top: 30px;">任務 2-2: 修復 Scratch 程式</h3>
             <p><strong>📖 任務說明：</strong> 這是「選擇排序法」中「找出最小值位置」的關鍵程式。但它好像壞了！請找出 <strong>(?)</strong> 應該填入什麼？</p>
             
-            <div class="scratch-puzzle">
-                <pre>
-  設 [最小值位置] 為 (1)
-  設 [資料位置] 為 (2)
-  重複 (4) 次
-    如果 ( (原始資料 的 第 (資料位置) 項) < (原始資料 的 第 <strong>(?)</strong> 項) ) 那麼
-      設 [最小值位置] 為 (資料位置)
-    改變 [資料位置] (1)
-                </pre>
-                
-                <p><strong>(?)</strong> 應該是：
-                    <select id="m2-quiz-select">
-                        <option value="">請選擇...</option>
-                        <option value="資料位置">資料位置</option>
-                        <option value="最小值位置">最小值位置</option>
-                        <option value="1">1</option>
-                    </select>
-                </p>
+            <div class="scratch-puzzle-container">
+                <div class="scratch-stack">
+                    <div class="scratch-block scratch-block-data">
+                        設 [最小值位置] 為 <span class="scratch-inline-input">1</span>
+                    </div>
+                    <div class="scratch-block scratch-block-data">
+                        設 [資料位置] 為 <span class="scratch-inline-input">2</span>
+                    </div>
+                    <div class="scratch-block scratch-block-control">
+                        重複 <span class="scratch-inline-input">4</span> 次
+                    </div>
+                    <div class="scratch-stack"> <div class="scratch-block scratch-block-control">
+                            如果
+                            <div class="scratch-block scratch-block-operator" style="display:inline-flex; align-items: center; padding: 5px;">
+                                <span class="scratch-inline-input">(原始資料 的 第 <div class="scratch-block scratch-block-data" style="margin: 0 3px;">資料位置</div> 項)</span>
+                                &lt;
+                                <span class="scratch-inline-input">(原始資料 的 第 
+                                    <select id="m2-quiz-select" class="scratch-quiz-select">
+                                        <option value="">(?)</option>
+                                        <option value="資料位置">資料位置</option>
+                                        <option value="最小值位置">最小值位置</option>
+                                        <option value="1">1</option>
+                                    </select>
+                                項)</span>
+                            </div>
+                            那麼
+                        </div>
+                        <div class="scratch-stack"> <div class="scratch-block scratch-block-data">
+                                設 [最小值位置] 為 <div class="scratch-block scratch-block-data" style="display:inline-block; margin: 0 3px;">資料位置</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="scratch-block scratch-block-data" style="margin-top: 5px;">
+                        改變 [資料位置] <span class="scratch-inline-input">1</span>
+                    </div>
+                </div>
             </div>
             
             <button class="btn btn-check" onclick="m2_checkQuiz()">檢查答案</button>
@@ -411,7 +426,7 @@
     </main>
 
     <footer>
-        <p>「演算法特務學院」 - 數位學習模組 Demo<br>
+        <p>「演算法特務學院」 - 數位學習模組 Demo (v3)<br>
         靈感來源：翰林版八年級資訊科技 (108課綱) 第六章</p>
     </footer>
 
@@ -443,16 +458,13 @@
         const m1_correctOrder = ["step-1", "step-2", "step-3", "step-4", "step-5", "step-6", "step-7"];
 
         function m1_init() {
-            // 重置功能
             const pool = document.getElementById('item-pool');
             const zone = document.getElementById('drop-zone');
             zone.innerHTML = '';
-            // 把所有項目移回 item-pool
             m1_correctOrder.forEach(id => {
                 const item = document.getElementById(id);
                 if (item) pool.appendChild(item);
             });
-            // 清除提示
             document.querySelectorAll('.drag-item').forEach(item => item.classList.remove('hint-glow'));
             document.getElementById('m1-feedback').style.display = 'none';
             document.getElementById('btn-m1-next').style.display = 'none';
@@ -489,14 +501,12 @@
             feedback.style.display = 'block';
         }
 
-        // [新增] 任務1提示功能
         function m1_showHint() {
             const dropZone = document.getElementById('drop-zone');
             const itemsInZone = dropZone.querySelectorAll('.drag-item');
             const nextStepIndex = itemsInZone.length;
             const feedback = document.getElementById('m1-feedback');
             
-            // 清除舊的發光提示
             document.querySelectorAll('.drag-item').forEach(item => item.classList.remove('hint-glow'));
 
             if (nextStepIndex >= m1_correctOrder.length) {
@@ -524,15 +534,45 @@
             feedback.className = 'feedback hint';
             feedback.style.display = 'block';
 
-            // 讓提示的項目發光
             if (nextStepElement && nextStepElement.parentElement.id === 'item-pool') {
                 nextStepElement.classList.add('hint-glow');
             }
         }
 
-        // --- 任務 2: 選擇排序法 ---
+        // --- 任務 2: 選擇排序法 (含暫停功能) ---
         let m2_data = [8, 5, 10, 1, 7];
         let m2_viz_container = document.getElementById('m2-viz-container');
+        let m2_isPaused = false;
+        let m2_pausePromiseResolver = null;
+        let m2_isRunning = false;
+
+        // [新增] 可暫停的 sleep 函式
+        function m2_pausableSleep(ms) {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    if (m2_isPaused) {
+                        m2_pausePromiseResolver = resolve;
+                    } else {
+                        resolve();
+                    }
+                }, ms);
+            });
+        }
+
+        // [新增] 暫停/繼續 切換
+        function m2_togglePause() {
+            m2_isPaused = !m2_isPaused;
+            const pauseBtn = document.getElementById('btn-m2-pause');
+            if (m2_isPaused) {
+                pauseBtn.textContent = '繼續 ▶️';
+            } else {
+                pauseBtn.textContent = '暫停 ⏸️';
+                if (m2_pausePromiseResolver) {
+                    m2_pausePromiseResolver();
+                    m2_pausePromiseResolver = null;
+                }
+            }
+        }
 
         function m2_init() {
             m2_resetVisualization();
@@ -549,40 +589,63 @@
                 box.textContent = val;
                 m2_viz_container.appendChild(box);
             });
+            // 重置暫停狀態
+            m2_isRunning = false;
+            m2_isPaused = false;
+            if (m2_pausePromiseResolver) { // 如果在暫停時重設，要解除 promise
+                m2_pausePromiseResolver();
+                m2_pausePromiseResolver = null;
+            }
+            document.getElementById('btn-m2-pause').textContent = '暫停 ⏸️';
+            document.getElementById('btn-m2-pause').disabled = true;
         }
         
+        // [修改] 演示函式
         async function m2_startVisualization() {
+            if (m2_isRunning) return; // 防止重複執行
+            m2_isRunning = true;
+            document.getElementById('btn-m2-pause').disabled = false;
+            
             m2_resetVisualization();
             let boxes = m2_viz_container.querySelectorAll('.data-box');
             let n = boxes.length;
 
             for (let i = 0; i < n - 1; i++) {
                 let minIdx = i;
-                boxes[i].classList.add('highlight-swap'); 
-                await sleep(800);
+                boxes[i].classList.add('highlight-swap'); // 標記當前比較的基準
+                await m2_pausableSleep(800);
 
+                // 找到未排序部分中的最小值
                 for (let j = i + 1; j < n; j++) {
-                    boxes[j].classList.add('highlight-min'); 
-                    await sleep(500);
+                    boxes[j].classList.add('highlight-min'); // 標記正在檢查的
+                    await m2_pausableSleep(500);
                     if (parseInt(boxes[j].textContent) < parseInt(boxes[minIdx].textContent)) {
                         boxes[minIdx].classList.remove('highlight-min', 'highlight-swap');
                         minIdx = j;
-                        boxes[minIdx].classList.add('highlight-min'); 
+                        boxes[minIdx].classList.add('highlight-min'); // 標記新的最小值
                     } else {
                         boxes[j].classList.remove('highlight-min');
                     }
                 }
                 
-                await sleep(800);
-                
+                await m2_pausableSleep(800);
+
+                // 交換
                 let temp = boxes[i].textContent;
                 boxes[i].textContent = boxes[minIdx].textContent;
                 boxes[minIdx].textContent = temp;
 
+                // 清除樣式
                 boxes.forEach(box => box.classList.remove('highlight-min', 'highlight-swap'));
-                boxes[i].classList.add('sorted'); 
+                boxes[i].classList.add('sorted'); // 標記已排序
             }
             boxes[n - 1].classList.add('sorted');
+            
+            // 演示結束
+            m2_isRunning = false;
+            m2_isPaused = false;
+            document.getElementById('btn-m2-pause').textContent = '暫停 ⏸️';
+            document.getElementById('btn-m2-pause').disabled = true;
         }
 
         function m2_checkQuiz() {
@@ -599,7 +662,6 @@
             feedback.style.display = 'block';
         }
 
-        // [新增] 任務2提示功能
         function m2_showHint() {
             const feedback = document.getElementById('m2-feedback');
             feedback.textContent = '💡 提示：我們要比較的是「目前正在檢查的項目」(由 [資料位置] 控制) 和「我們*暫時*找到的最小項目」(由 [最小值位置] 控制)。所以 (?) 應該是...？';
@@ -612,7 +674,6 @@
         let m3_seq_target = 10;
         let m3_seq_count = 0;
         let m3_seq_found = false;
-
         let m3_bin_data = [1, 5, 7, 8, 10];
         let m3_bin_target = 10;
         
@@ -644,7 +705,6 @@
             if (m3_seq_found) return; 
             
             const feedback = document.getElementById('m3-seq-feedback');
-            // [修改] 強化提示
             if (index !== m3_seq_count) {
                 feedback.textContent = `❌ 點錯順序了！「循序」搜尋的SOP，就是從*最左邊*一個一個來。請點擊第 ${m3_seq_count + 1} 個方塊。`;
                 feedback.className = 'feedback error';
@@ -664,7 +724,7 @@
                 document.getElementById('btn-m3-next').style.display = 'inline-block';
             } else {
                 feedback.textContent = `第 ${m3_seq_count} 次： ${val} 不是目標... 繼續找下一個。`;
-                feedback.className = 'feedback hint'; // 改為 hint 樣式，減少挫折感
+                feedback.className = 'feedback hint'; 
             }
             feedback.style.display = 'block';
         }
@@ -680,10 +740,10 @@
                 container.appendChild(box);
             });
             document.getElementById('m3-bin-feedback').style.display = 'none';
-            m3_startBinarySearch(0, m3_bin_data.length - 1, 0); // [修改] 增加計數器
+            m3_startBinarySearch(0, m3_bin_data.length - 1, 0); 
         }
 
-        function m3_startBinarySearch(low, high, count) { // [修改]
+        function m3_startBinarySearch(low, high, count) { 
             const guide = document.getElementById('m3-bin-guide');
             const feedback = document.getElementById('m3-bin-feedback');
             const boxes = document.querySelectorAll('#m3-bin-container .data-box');
@@ -705,7 +765,7 @@
 
             let mid = Math.floor((low + high) / 2);
             let midVal = m3_bin_data[mid];
-            let newCount = count + 1; // [修改]
+            let newCount = count + 1; 
             
             boxes[mid].classList.add('highlight-min'); 
 
@@ -720,7 +780,7 @@
             `;
         }
 
-        function m3_handleBinaryChoice(low, high, mid, choice, count) { // [修改]
+        function m3_handleBinaryChoice(low, high, mid, choice, count) { 
             const midVal = m3_bin_data[mid];
             const feedback = document.getElementById('m3-bin-feedback');
             const boxes = document.querySelectorAll('#m3-bin-container .data-box');
@@ -731,12 +791,11 @@
             else if (m3_bin_target > midVal) correctChoice = 'more';
             else correctChoice = 'equal';
 
-            // [修改] 強化提示
             if (choice !== correctChoice) {
                 feedback.textContent = `❌ 判斷錯誤！再想一下... 我們的目標是 ${m3_bin_target}，而中間值是 ${midVal}。 ${m3_bin_target} 應該在 ${midVal} 的哪一邊呢？`;
                 feedback.className = 'feedback error';
                 feedback.style.display = 'block';
-                m3_startBinarySearch(low, high, count - 1); // 重來這一步 (計數器減回)
+                m3_startBinarySearch(low, high, count - 1); 
                 return;
             }
 
@@ -803,19 +862,17 @@
                 feedback.textContent = '🎉 排序正確！準備進行 Part 2！';
                 feedback.className = 'feedback success';
                 document.getElementById('m4-part2').style.display = 'block';
-                m4_startBinarySearch(0, m4_sorted_data.length - 1, 0); // [修改]
+                m4_startBinarySearch(0, m4_sorted_data.length - 1, 0); 
             } else {
                 feedback.textContent = '❌ 排序錯誤！請重設並再試一次。(或按提示)';
                 feedback.className = 'feedback error';
-                // 簡易重設
-                setTimeout(() => { // 讓學生看到錯誤訊息
+                setTimeout(() => { 
                     m4_init();
                 }, 1500);
             }
             feedback.style.display = 'block';
         }
 
-        // [新增] 任務4提示功能
         function m4_showHint() {
             const feedback = document.getElementById('m4-sort-feedback');
             let correctSorted = [...m4_data].sort((a, b) => a - b);
@@ -831,8 +888,7 @@
             feedback.style.display = 'block';
         }
         
-        // 借用 M3 的二元搜尋邏輯，但操作 M4 的元素
-        function m4_startBinarySearch(low, high, count) { // [修改]
+        function m4_startBinarySearch(low, high, count) { 
             const guide = document.getElementById('m4-bin-guide');
             const feedback = document.getElementById('m4-bin-feedback');
             const container = document.getElementById('m4-bin-container');
@@ -860,7 +916,7 @@
 
             let mid = Math.floor((low + high) / 2);
             let midVal = m4_sorted_data[mid];
-            let newCount = count + 1; // [修改]
+            let newCount = count + 1; 
             
             boxes[mid].classList.add('highlight-min');
 
@@ -874,7 +930,7 @@
             `;
         }
 
-        function m4_handleBinaryChoice(low, high, mid, choice, count) { // [修改]
+        function m4_handleBinaryChoice(low, high, mid, choice, count) { 
             const midVal = m4_sorted_data[mid];
             const feedback = document.getElementById('m4-bin-feedback');
             
@@ -883,12 +939,11 @@
             else if (m4_target > midVal) correctChoice = 'more';
             else correctChoice = 'equal';
 
-            // [修改] 強化提示
             if (choice !== correctChoice) {
                 feedback.textContent = `❌ 判斷錯誤！再想一下... 我們的目標是 ${m4_target}，而中間值是 ${midVal}。 ${m4_target} 應該在 ${midVal} 的哪一邊呢？`;
                 feedback.className = 'feedback error';
                 feedback.style.display = 'block';
-                m4_startBinarySearch(low, high, count - 1); // 重來這一步
+                m4_startBinarySearch(low, high, count - 1); 
                 return;
             }
             
@@ -908,11 +963,6 @@
             } else if (choice === 'more') {
                 m4_startBinarySearch(mid + 1, high, count);
             }
-        }
-        
-        // --- 輔助工具 ---
-        function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
         }
 
     </script>
