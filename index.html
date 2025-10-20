@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>演算法特務學院</title>
+    <title>演算法特務學院 (v2 - 支援版)</title>
     <style>
         /* --- 全局樣式 --- */
         body {
@@ -97,6 +97,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin: 5px; /* 增加間距 */
         }
         .btn:hover {
             background-color: #357ABD;
@@ -121,6 +122,14 @@
         .btn-reset:hover {
             background-color: #c0392b;
         }
+        /* [新增] 提示按鈕樣式 */
+        .btn-hint {
+            background-color: #9b59b6; /* 紫色 */
+        }
+        .btn-hint:hover {
+            background-color: #8e44ad;
+        }
+
 
         /* --- 任務1：拖曳排序 --- */
         #drop-zone {
@@ -199,6 +208,15 @@
             color: #bbb;
             opacity: 0.6;
         }
+        /* [新增] 提示方塊樣式 (任務1) */
+        .drag-item.hint-glow {
+            animation: glow 1.5s infinite;
+        }
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px #9b59b6; }
+            50% { box-shadow: 0 0 20px #9b59b6; }
+            100% { box-shadow: 0 0 5px #9b59b6; }
+        }
 
         /* --- Scratch 拼圖 --- */
         .scratch-puzzle {
@@ -235,6 +253,12 @@
             background: #f2dede;
             color: #a94442;
             border: 1px solid #ebccd1;
+        }
+        /* [新增] 提示訊息樣式 */
+        .feedback.hint {
+            background: #fcf8e3;
+            color: #8a6d3b;
+            border: 1px solid #faebcc;
         }
 
         /* --- 頁腳 --- */
@@ -278,6 +302,7 @@
             </div>
 
             <button class="btn btn-check" onclick="m1_checkOrder()">驗收成果</button>
+            <button class="btn btn-hint" onclick="m1_showHint()">需要提示嗎？💡</button>
             <div id="m1-feedback" class="feedback"></div>
             <button class="btn btn-next" onclick="showMission('mission-2')" style="display:none;" id="btn-m1-next">前往 Mission 2 ➡️</button>
         </section>
@@ -296,7 +321,7 @@
             <button class="btn btn-reset" onclick="m2_resetVisualization()">重新演示</button>
 
             <h3 style="margin-top: 30px;">任務 2-2: 修復 Scratch 程式</h3>
-            <p><strong>📖 任務說明：</strong> 這是「選擇排序法」中「找出最小值位置」的關鍵程式 。但它好像壞了！請找出 <strong>(?)</strong> 應該填入什麼？</p>
+            <p><strong>📖 任務說明：</strong> 這是「選擇排序法」中「找出最小值位置」的關鍵程式。但它好像壞了！請找出 <strong>(?)</strong> 應該填入什麼？</p>
             
             <div class="scratch-puzzle">
                 <pre>
@@ -319,6 +344,7 @@
             </div>
             
             <button class="btn btn-check" onclick="m2_checkQuiz()">檢查答案</button>
+            <button class="btn btn-hint" onclick="m2_showHint()">需要提示嗎？💡</button>
             <div id="m2-feedback" class="feedback"></div>
             <button class="btn btn-next" onclick="showMission('mission-3')" style="display:none;" id="btn-m2-next">前往 Mission 3 ➡️</button>
         </section>
@@ -330,7 +356,7 @@
             </p>
 
             <h3>任務 3-1: 循序搜尋法</h3>
-            <p><strong>📖 任務說明：</strong> 在這堆 <strong>未排序</strong> 的彈藥箱 [ 8, 5, 10, 1, 7 ] 中，找出 <strong>10號</strong> 彈藥 。你必須 *從左到右* 依序點擊檢查！</p>
+            <p><strong>📖 任務說明：</strong> 在這堆 <strong>未排序</strong> 的彈藥箱 [ 8, 5, 10, 1, 7 ] 中，找出 <strong>10號</strong> 彈藥。你必須 *從左到右* 依序點擊檢查！</p>
             <div id="m3-seq-container" class="data-container">
                 </div>
             <p>你已比較了 <strong id="m3-seq-count">0</strong> 次。</p>
@@ -338,7 +364,7 @@
             <div id="m3-seq-feedback" class="feedback"></div>
 
             <h3 style="margin-top: 30px;">任務 3-2: 二元搜尋法</h3>
-            <p><strong>📖 任務說明：</strong> 這次彈藥箱 <strong>已排序</strong> [ 1, 5, 7, 8, 10 ]。我們要找出 <strong>10號</strong> 彈藥 [cite: 19, 20]。請跟隨系統的提示，使用「二元搜尋法」（折半搜尋）！</p>
+            <p><strong>📖 任務說明：</strong> 這次彈藥箱 <strong>已排序</strong> [ 1, 5, 7, 8, 10 ]。我們要找出 <strong>10號</strong> 彈藥。請跟隨系統的提示，使用「二元搜尋法」（折半搜尋）！</p>
             <div id="m3-bin-container" class="data-container">
                 </div>
             <div id="m3-bin-guide">
@@ -364,6 +390,7 @@
             <p><strong>你的排序結果 (點擊上方數字來排序)：</strong></p>
             <div id="m4-sort-result" class="data-container" style="min-height: 70px; background: #f9f9f9; border: 1px dashed #ccc;"></div>
             <button class="btn btn-check" onclick="m4_checkSort()">確認排序</button>
+            <button class="btn btn-hint" onclick="m4_showHint()">排序提示💡</button>
             <div id="m4-sort-feedback" class="feedback"></div>
 
             <div id="m4-part2" style="display:none;">
@@ -411,7 +438,7 @@
             m4_init();
         });
 
-        // --- 任務 1: 拖曳排序 (蛋炒飯)  ---
+        // --- 任務 1: 拖曳排序 (蛋炒飯) ---
         let m1_draggedItem = null;
         const m1_correctOrder = ["step-1", "step-2", "step-3", "step-4", "step-5", "step-6", "step-7"];
 
@@ -420,7 +447,13 @@
             const pool = document.getElementById('item-pool');
             const zone = document.getElementById('drop-zone');
             zone.innerHTML = '';
-            document.querySelectorAll('.drag-item').forEach(item => pool.appendChild(item));
+            // 把所有項目移回 item-pool
+            m1_correctOrder.forEach(id => {
+                const item = document.getElementById(id);
+                if (item) pool.appendChild(item);
+            });
+            // 清除提示
+            document.querySelectorAll('.drag-item').forEach(item => item.classList.remove('hint-glow'));
             document.getElementById('m1-feedback').style.display = 'none';
             document.getElementById('btn-m1-next').style.display = 'none';
         }
@@ -431,8 +464,9 @@
 
         function m1_handleDrop(e) {
             e.preventDefault();
-            if (m1_draggedItem) {
-                e.target.closest('#drop-zone').appendChild(m1_draggedItem);
+            const dropZone = e.target.closest('#drop-zone');
+            if (dropZone && m1_draggedItem) {
+                dropZone.appendChild(m1_draggedItem);
                 m1_draggedItem = null;
             }
         }
@@ -449,13 +483,54 @@
                 feedback.className = 'feedback success';
                 document.getElementById('btn-m1-next').style.display = 'inline-block';
             } else {
-                feedback.textContent = '❌ 步驟錯誤！這個味道...不太對勁。再試一次！';
+                feedback.textContent = '❌ 步驟錯誤！這個味道...不太對勁。再試一次！(或者按提示按鈕)';
                 feedback.className = 'feedback error';
             }
             feedback.style.display = 'block';
         }
 
-        // --- 任務 2: 選擇排序法  ---
+        // [新增] 任務1提示功能
+        function m1_showHint() {
+            const dropZone = document.getElementById('drop-zone');
+            const itemsInZone = dropZone.querySelectorAll('.drag-item');
+            const nextStepIndex = itemsInZone.length;
+            const feedback = document.getElementById('m1-feedback');
+            
+            // 清除舊的發光提示
+            document.querySelectorAll('.drag-item').forEach(item => item.classList.remove('hint-glow'));
+
+            if (nextStepIndex >= m1_correctOrder.length) {
+                feedback.textContent = '💡 你已經把所有步驟都放進去了，檢查一下順序吧！';
+                feedback.className = 'feedback hint';
+                feedback.style.display = 'block';
+                return;
+            }
+            
+            const nextStepId = m1_correctOrder[nextStepIndex];
+            const nextStepElement = document.getElementById(nextStepId);
+            
+            let hintText = '';
+            switch(nextStepId) {
+                case 'step-1': hintText = '提示：第一步當然是... 先倒油！'; break;
+                case 'step-2': hintText = '提示：油倒了，接下來要... 加熱！'; break;
+                case 'step-3': hintText = '提示：油熱了，該放什麼下去了？ (蛋)'; break;
+                case 'step-4': hintText = '提示：蛋下鍋了，要快點... 攪拌！'; break;
+                case 'step-5': hintText = '提示：蛋熟了，主角... 米飯登場！'; break;
+                case 'step-6': hintText = '提示：飯放進去了，要把它... 炒散！'; break;
+                case 'step-7': hintText = '提示：最後一步，讓它變好吃... 調味！'; break;
+            }
+
+            feedback.textContent = hintText;
+            feedback.className = 'feedback hint';
+            feedback.style.display = 'block';
+
+            // 讓提示的項目發光
+            if (nextStepElement && nextStepElement.parentElement.id === 'item-pool') {
+                nextStepElement.classList.add('hint-glow');
+            }
+        }
+
+        // --- 任務 2: 選擇排序法 ---
         let m2_data = [8, 5, 10, 1, 7];
         let m2_viz_container = document.getElementById('m2-viz-container');
 
@@ -476,7 +551,6 @@
             });
         }
         
-        // 異步函式，用於演示
         async function m2_startVisualization() {
             m2_resetVisualization();
             let boxes = m2_viz_container.querySelectorAll('.data-box');
@@ -484,32 +558,29 @@
 
             for (let i = 0; i < n - 1; i++) {
                 let minIdx = i;
-                boxes[i].classList.add('highlight-swap'); // 標記當前比較的基準
+                boxes[i].classList.add('highlight-swap'); 
                 await sleep(800);
 
-                // 找到未排序部分中的最小值
                 for (let j = i + 1; j < n; j++) {
-                    boxes[j].classList.add('highlight-min'); // 標記正在檢查的
+                    boxes[j].classList.add('highlight-min'); 
                     await sleep(500);
                     if (parseInt(boxes[j].textContent) < parseInt(boxes[minIdx].textContent)) {
                         boxes[minIdx].classList.remove('highlight-min', 'highlight-swap');
                         minIdx = j;
-                        boxes[minIdx].classList.add('highlight-min'); // 標記新的最小值
+                        boxes[minIdx].classList.add('highlight-min'); 
                     } else {
                         boxes[j].classList.remove('highlight-min');
                     }
                 }
                 
                 await sleep(800);
-
-                // 交換
+                
                 let temp = boxes[i].textContent;
                 boxes[i].textContent = boxes[minIdx].textContent;
                 boxes[minIdx].textContent = temp;
 
-                // 清除樣式
                 boxes.forEach(box => box.classList.remove('highlight-min', 'highlight-swap'));
-                boxes[i].classList.add('sorted'); // 標記已排序
+                boxes[i].classList.add('sorted'); 
             }
             boxes[n - 1].classList.add('sorted');
         }
@@ -517,20 +588,26 @@
         function m2_checkQuiz() {
             const answer = document.getElementById('m2-quiz-select').value;
             const feedback = document.getElementById('m2-feedback');
-            // 對應課本  的邏輯，是要跟當前的「最小值位置」的項目比
             if (answer === '最小值位置') {
                 feedback.textContent = '🎉 正確！就是要跟當前紀錄的「最小值位置」上的數字比較。程式修復完畢！';
                 feedback.className = 'feedback success';
                 document.getElementById('btn-m2-next').style.display = 'inline-block';
             } else {
-                feedback.textContent = '❌ 錯誤！再想想看，我們要比較的是「當前項目」和「我們*紀錄*的最小項目」喔。';
+                feedback.textContent = '❌ 錯誤！再想想看，或按提示鈕。';
                 feedback.className = 'feedback error';
             }
             feedback.style.display = 'block';
         }
 
+        // [新增] 任務2提示功能
+        function m2_showHint() {
+            const feedback = document.getElementById('m2-feedback');
+            feedback.textContent = '💡 提示：我們要比較的是「目前正在檢查的項目」(由 [資料位置] 控制) 和「我們*暫時*找到的最小項目」(由 [最小值位置] 控制)。所以 (?) 應該是...？';
+            feedback.className = 'feedback hint';
+            feedback.style.display = 'block';
+        }
 
-        // --- 任務 3: 搜尋  ---
+        // --- 任務 3: 搜尋 ---
         let m3_seq_data = [8, 5, 10, 1, 7];
         let m3_seq_target = 10;
         let m3_seq_count = 0;
@@ -564,11 +641,12 @@
         }
         
         function m3_checkSequential(box, val, index) {
-            if (m3_seq_found) return; // 找到了就別玩了
+            if (m3_seq_found) return; 
             
+            const feedback = document.getElementById('m3-seq-feedback');
+            // [修改] 強化提示
             if (index !== m3_seq_count) {
-                const feedback = document.getElementById('m3-seq-feedback');
-                feedback.textContent = '❌ 探員！你沒有「依序」搜尋！循序搜尋必須從第一個開始。';
+                feedback.textContent = `❌ 點錯順序了！「循序」搜尋的SOP，就是從*最左邊*一個一個來。請點擊第 ${m3_seq_count + 1} 個方塊。`;
                 feedback.className = 'feedback error';
                 feedback.style.display = 'block';
                 return;
@@ -576,18 +654,17 @@
 
             m3_seq_count++;
             document.getElementById('m3-seq-count').textContent = m3_seq_count;
-            box.classList.add('highlight-swap'); // 標記檢查過
+            box.classList.add('highlight-swap'); 
 
-            const feedback = document.getElementById('m3-seq-feedback');
             if (val === m3_seq_target) {
                 m3_seq_found = true;
                 feedback.textContent = `🎉 找到了！目標是 ${val}。你總共比較了 ${m3_seq_count} 次。`;
                 feedback.className = 'feedback success';
                 box.classList.add('sorted');
-                document.getElementById('btn-m3-next').style.display = 'inline-block'; // 顯示通往下一關
+                document.getElementById('btn-m3-next').style.display = 'inline-block';
             } else {
-                feedback.textContent = `第 ${m3_seq_count} 次： ${val} 不是目標... 繼續找。`;
-                feedback.className = 'feedback';
+                feedback.textContent = `第 ${m3_seq_count} 次： ${val} 不是目標... 繼續找下一個。`;
+                feedback.className = 'feedback hint'; // 改為 hint 樣式，減少挫折感
             }
             feedback.style.display = 'block';
         }
@@ -603,15 +680,14 @@
                 container.appendChild(box);
             });
             document.getElementById('m3-bin-feedback').style.display = 'none';
-            m3_startBinarySearch(0, m3_bin_data.length - 1);
+            m3_startBinarySearch(0, m3_bin_data.length - 1, 0); // [修改] 增加計數器
         }
 
-        function m3_startBinarySearch(low, high) {
+        function m3_startBinarySearch(low, high, count) { // [修改]
             const guide = document.getElementById('m3-bin-guide');
             const feedback = document.getElementById('m3-bin-feedback');
             const boxes = document.querySelectorAll('#m3-bin-container .data-box');
             
-            // 標記當前範圍
             boxes.forEach((box, i) => {
                 if (i >= low && i <= high) {
                     box.classList.remove('disabled');
@@ -621,7 +697,7 @@
             });
 
             if (low > high) {
-                feedback.textContent = '❌ 範圍內找不到了！任務失敗。';
+                feedback.textContent = '❌ 咦？範圍內找不到了！任務失敗。';
                 feedback.className = 'feedback error';
                 feedback.style.display = 'block';
                 return;
@@ -629,20 +705,22 @@
 
             let mid = Math.floor((low + high) / 2);
             let midVal = m3_bin_data[mid];
+            let newCount = count + 1; // [修改]
             
-            boxes[mid].classList.add('highlight-min'); // 標記中間值
+            boxes[mid].classList.add('highlight-min'); 
 
             guide.innerHTML = `
+                <p><strong>第 ${newCount} 次比較：</strong></p>
                 <p>目前搜尋範圍：索引 [${low}] 到 [${high}]。</p>
                 <p>我們檢查中間位置 (索引 ${mid})，數字是 <strong>${midVal}</strong>。</p>
                 <p>目標 <strong>${m3_bin_target}</strong> 比 <strong>${midVal}</strong> ...？</p>
-                <button class="btn" onclick="m3_handleBinaryChoice(${low}, ${high}, ${mid}, 'less')">小</button>
-                <button class="btn" onclick="m3_handleBinaryChoice(${low}, ${high}, ${mid}, 'equal')">等於</button>
-                <button class="btn" onclick="m3_handleBinaryChoice(${low}, ${high}, ${mid}, 'more')">大</button>
+                <button class="btn" onclick="m3_handleBinaryChoice(${low}, ${high}, ${mid}, 'less', ${newCount})">小</button>
+                <button class="btn" onclick="m3_handleBinaryChoice(${low}, ${high}, ${mid}, 'equal', ${newCount})">等於</button>
+                <button class="btn" onclick="m3_handleBinaryChoice(${low}, ${high}, ${mid}, 'more', ${newCount})">大</button>
             `;
         }
 
-        function m3_handleBinaryChoice(low, high, mid, choice) {
+        function m3_handleBinaryChoice(low, high, mid, choice, count) { // [修改]
             const midVal = m3_bin_data[mid];
             const feedback = document.getElementById('m3-bin-feedback');
             const boxes = document.querySelectorAll('#m3-bin-container .data-box');
@@ -653,33 +731,34 @@
             else if (m3_bin_target > midVal) correctChoice = 'more';
             else correctChoice = 'equal';
 
+            // [修改] 強化提示
             if (choice !== correctChoice) {
-                feedback.textContent = '❌ 判斷錯誤！再想一下。';
+                feedback.textContent = `❌ 判斷錯誤！再想一下... 我們的目標是 ${m3_bin_target}，而中間值是 ${midVal}。 ${m3_bin_target} 應該在 ${midVal} 的哪一邊呢？`;
                 feedback.className = 'feedback error';
                 feedback.style.display = 'block';
-                m3_startBinarySearch(low, high); // 重來這一步
+                m3_startBinarySearch(low, high, count - 1); // 重來這一步 (計數器減回)
                 return;
             }
 
-            feedback.style.display = 'none'; // 答對，清除錯誤訊息
+            feedback.style.display = 'none'; 
 
             if (choice === 'equal') {
-                feedback.textContent = `🎉 找到了！目標就是 ${midVal}！這就是二元搜尋法！`;
+                feedback.textContent = `🎉 找到了！目標就是 ${midVal}！總共比較了 ${count} 次。比循序搜尋快多了！`;
                 feedback.className = 'feedback success';
                 feedback.style.display = 'block';
                 boxes[mid].classList.add('sorted');
                 document.getElementById('m3-bin-guide').innerHTML = '';
             } else if (choice === 'less') {
-                m3_startBinarySearch(low, mid - 1); // 搜尋左半邊
+                m3_startBinarySearch(low, mid - 1, count); 
             } else if (choice === 'more') {
-                m3_startBinarySearch(mid + 1, high); // 搜尋右半邊
+                m3_startBinarySearch(mid + 1, high, count);
             }
         }
 
         // --- 任務 4: 最終試煉 ---
         let m4_data = [42, 15, 7, 99, 30];
         let m4_sorted_data = [];
-        let m4_target = 30; // 預設一個在裡面的
+        let m4_target = 30; 
         
         function m4_init() {
             const pool = document.getElementById('m4-sort-pool');
@@ -688,9 +767,8 @@
             result.innerHTML = '';
             m4_sorted_data = [];
             
-            // 隨機生成新數字
             m4_data = Array.from({length: 5}, () => Math.floor(Math.random() * 100) + 1);
-            m4_target = m4_data[Math.floor(Math.random() * m4_data.length)]; // 確保目標一定在
+            m4_target = m4_data[Math.floor(Math.random() * m4_data.length)]; 
             
             m4_data.forEach(val => {
                 let box = document.createElement('div');
@@ -703,6 +781,7 @@
             document.getElementById('m4-target-num').textContent = m4_target;
             document.getElementById('m4-part2').style.display = 'none';
             document.getElementById('m4-sort-feedback').style.display = 'none';
+            document.getElementById('m4-bin-feedback').style.display = 'none';
             document.getElementById('m4-final-feedback').style.display = 'none';
         }
 
@@ -713,7 +792,7 @@
             newBox.className = 'data-box';
             newBox.textContent = val;
             result.appendChild(newBox);
-            box.style.display = 'none'; // 從池中隱藏
+            box.style.display = 'none'; 
         }
 
         function m4_checkSort() {
@@ -724,24 +803,40 @@
                 feedback.textContent = '🎉 排序正確！準備進行 Part 2！';
                 feedback.className = 'feedback success';
                 document.getElementById('m4-part2').style.display = 'block';
-                // 開始Part 2
-                m4_startBinarySearch(0, m4_sorted_data.length - 1);
+                m4_startBinarySearch(0, m4_sorted_data.length - 1, 0); // [修改]
             } else {
-                feedback.textContent = '❌ 排序錯誤！請重設並再試一次。';
+                feedback.textContent = '❌ 排序錯誤！請重設並再試一次。(或按提示)';
                 feedback.className = 'feedback error';
                 // 簡易重設
-                m4_init(); 
+                setTimeout(() => { // 讓學生看到錯誤訊息
+                    m4_init();
+                }, 1500);
             }
+            feedback.style.display = 'block';
+        }
+
+        // [新增] 任務4提示功能
+        function m4_showHint() {
+            const feedback = document.getElementById('m4-sort-feedback');
+            let correctSorted = [...m4_data].sort((a, b) => a - b);
+            if(m4_sorted_data.length >= correctSorted.length) {
+                feedback.textContent = '💡 你已經選完所有數字了，按「確認排序」吧！';
+                feedback.className = 'feedback hint';
+                feedback.style.display = 'block';
+                return;
+            }
+            let nextNum = correctSorted[m4_sorted_data.length];
+            feedback.textContent = '💡 提示：『從小排到大』，你選的下一個數字，應該是剩下數字中最小的... 也就是 ' + nextNum + '。';
+            feedback.className = 'feedback hint';
             feedback.style.display = 'block';
         }
         
         // 借用 M3 的二元搜尋邏輯，但操作 M4 的元素
-        function m4_startBinarySearch(low, high) {
+        function m4_startBinarySearch(low, high, count) { // [修改]
             const guide = document.getElementById('m4-bin-guide');
             const feedback = document.getElementById('m4-bin-feedback');
             const container = document.getElementById('m4-bin-container');
             
-            // 繪製排好序的方塊
             container.innerHTML = '';
             m4_sorted_data.forEach(val => {
                 let box = document.createElement('div');
@@ -765,34 +860,35 @@
 
             let mid = Math.floor((low + high) / 2);
             let midVal = m4_sorted_data[mid];
+            let newCount = count + 1; // [修改]
             
             boxes[mid].classList.add('highlight-min');
 
             guide.innerHTML = `
+                <p><strong>第 ${newCount} 次比較：</strong></p>
                 <p>搜尋範圍 [${low}] 到 [${high}]。中間 (索引 ${mid}) 是 <strong>${midVal}</strong>。</p>
                 <p>目標 <strong>${m4_target}</strong> 和 <strong>${midVal}</strong> 相比？</p>
-                <button class="btn" onclick="m4_handleBinaryChoice(${low}, ${high}, ${mid}, 'less')">小</button>
-                <button class="btn" onclick="m4_handleBinaryChoice(${low}, ${high}, ${mid}, 'equal')">等於</button>
-                <button class="btn" onclick="m4_handleBinaryChoice(${low}, ${high}, ${mid}, 'more')">大</button>
+                <button class="btn" onclick="m4_handleBinaryChoice(${low}, ${high}, ${mid}, 'less', ${newCount})">小</button>
+                <button class="btn" onclick="m4_handleBinaryChoice(${low}, ${high}, ${mid}, 'equal', ${newCount})">等於</button>
+                <button class="btn" onclick="m4_handleBinaryChoice(${low}, ${high}, ${mid}, 'more', ${newCount})">大</button>
             `;
         }
 
-        function m4_handleBinaryChoice(low, high, mid, choice) {
+        function m4_handleBinaryChoice(low, high, mid, choice, count) { // [修改]
             const midVal = m4_sorted_data[mid];
             const feedback = document.getElementById('m4-bin-feedback');
-            const container = document.getElementById('m4-bin-container');
-            const boxes = container.querySelectorAll('.data-box');
             
             let correctChoice = '';
             if (m4_target < midVal) correctChoice = 'less';
             else if (m4_target > midVal) correctChoice = 'more';
             else correctChoice = 'equal';
 
+            // [修改] 強化提示
             if (choice !== correctChoice) {
-                feedback.textContent = '❌ 判斷錯誤！再想一下。';
+                feedback.textContent = `❌ 判斷錯誤！再想一下... 我們的目標是 ${m4_target}，而中間值是 ${midVal}。 ${m4_target} 應該在 ${midVal} 的哪一邊呢？`;
                 feedback.className = 'feedback error';
                 feedback.style.display = 'block';
-                m4_startBinarySearch(low, high); // 重來這一步
+                m4_startBinarySearch(low, high, count - 1); // 重來這一步
                 return;
             }
             
@@ -805,12 +901,12 @@
                 <button class="btn btn-next" onclick="location.reload()">重新挑戰學院</button>
                 `;
                 document.getElementById('m4-final-feedback').style.display = 'block';
-                boxes[mid].classList.add('sorted');
+                document.querySelector(`#m4-bin-container .data-box:nth-child(${mid + 1})`).classList.add('sorted');
                 document.getElementById('m4-bin-guide').innerHTML = '';
             } else if (choice === 'less') {
-                m4_startBinarySearch(low, mid - 1);
+                m4_startBinarySearch(low, mid - 1, count);
             } else if (choice === 'more') {
-                m4_startBinarySearch(mid + 1, high);
+                m4_startBinarySearch(mid + 1, high, count);
             }
         }
         
