@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>演算法特務學院</title>
+    <style>
+        /* --- 全局樣式 --- */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+            background-color: #f0f4f8;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        /* --- 標題欄 --- */
+        header {
+            background: linear-gradient(135deg, #4a90e2, #50e3c2);
+            color: white;
+            padding: 20px 40px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border-bottom: 5px solid #43a047;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        }
+        header p {
+            margin: 5px 0 0;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        /* --- 主內容區 --- */
+        main {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        /* --- 任務卡片樣式 --- */
+        .mission {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+            padding: 25px 30px;
+            border: 1px solid #e0e0e0;
+            display: none; /* 預設隱藏所有任務 */
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .mission h2 {
+            color: #4a90e2;
+            border-bottom: 2px solid #f0f4f8;
+            padding-bottom: 10px;
+            font-size: 2rem;
+            margin-top: 0;
+        }
+        .mission h2 span {
+            font-size: 1rem;
+            color: #777;
+            font-weight: normal;
+            margin-left: 10px;
+            background: #eee;
+            padding: 3px 8px;
+            border-radius: 5px;
+        }
+
+        .mission-intro {
+            font-size: 1.1rem;
+            background: #f9f9f9;
+            border-left: 5px solid #50e3c2;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        /* --- 互動按鈕 --- */
+        .btn {
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .btn:hover {
+            background-color: #357ABD;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .btn-next {
+            background-color: #4CAF50; /* 綠色 */
+        }
+        .btn-next:hover {
+            background-color: #43a047;
+        }
+        .btn-check {
+            background-color: #f39c12; /* 橘色 */
+        }
+        .btn-check:hover {
+            background-color: #e67e22;
+        }
+        .btn-reset {
+            background-color: #e74c3c; /* 紅色 */
+        }
+        .btn-reset:hover {
+            background-color: #c0392b;
+        }
+
+        /* --- 任務1：拖曳排序 --- */
+        #drop-zone {
+            background: #fdfdfd;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 200px;
+            margin: 20px 0;
+        }
+        .drag-item {
+            background-color: #50e3c2;
+            color: #333;
+            padding: 10px 15px;
+            margin: 10px;
+            border-radius: 5px;
+            cursor: move;
+            text-align: center;
+            font-weight: bold;
+            border: 1px solid #43a047;
+        }
+        #item-pool {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            background: #f0f4f8;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        /* --- 任務2 & 3：視覺化方塊 --- */
+        .data-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            flex-wrap: wrap;
+        }
+        .data-box {
+            width: 60px;
+            height: 60px;
+            background: #e0e0e0;
+            border: 1px solid #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 8px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        .data-box.highlight-min {
+            background-color: #f39c12; /* 橘色 */
+            color: white;
+            border-color: #e67e22;
+        }
+        .data-box.highlight-swap {
+            background-color: #e74c3c; /* 紅色 */
+            color: white;
+            border-color: #c0392b;
+        }
+        .data-box.sorted {
+            background-color: #4CAF50; /* 綠色 */
+            color: white;
+            border-color: #43a047;
+        }
+        .data-box.search-target {
+            cursor: pointer;
+        }
+         .data-box.search-target:hover {
+            transform: scale(1.1);
+        }
+        .data-box.disabled {
+            background: #f5f5f5;
+            color: #bbb;
+            opacity: 0.6;
+        }
+
+        /* --- Scratch 拼圖 --- */
+        .scratch-puzzle {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.1rem;
+        }
+        .scratch-puzzle select {
+            font-size: 1rem;
+            padding: 5px;
+            border: 2px solid #4a90e2;
+            border-radius: 5px;
+        }
+        
+        /* --- 結果提示 --- */
+        .feedback {
+            font-size: 1.1rem;
+            font-weight: bold;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: none;
+        }
+        .feedback.success {
+            background: #dff0d8;
+            color: #3c763d;
+            border: 1px solid #d6e9c6;
+        }
+        .feedback.error {
+            background: #f2dede;
+            color: #a94442;
+            border: 1px solid #ebccd1;
+        }
+
+        /* --- 頁腳 --- */
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            background: #333;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🕵️ 演算法特務學院 🕵️</h1>
+        <p>你的任務，就是學會如何聰明地解決問題！</p>
+    </header>
+
+    <main>
+
+        <section id="mission-1" class="mission">
+            <h2>Mission 1: 特務的食譜 <span>(演算法基礎)</span></h2>
+            <p class="mission-intro">
+                <strong>教官：</strong> 「探員，歡迎來到學院！演算法就是『解決問題的步驟』。你的第一個任務：按照『機密食譜』(蛋炒飯)的正確步驟，準備你的能量餐！」
+            </p>
+            <p><strong>📖 任務說明：</strong> 請將下方的步驟拖曳到上方的「烹飪區」中，並排列成正確的順序。</p>
+            
+            <div id="drop-zone" ondragover="event.preventDefault()" ondrop="m1_handleDrop(event)">
+                </div>
+
+            <div id="item-pool">
+                <div class="drag-item" id="step-3" draggable="true" ondragstart="m1_handleDragStart(event)">開中火，加入蛋</div>
+                <div class="drag-item" id="step-1" draggable="true" ondragstart="m1_handleDragStart(event)">放入適量的油至鍋中</div>
+                <div class="drag-item" id="step-5" draggable="true" ondragstart="m1_handleDragStart(event)">加入米飯</div>
+                <div class="drag-item" id="step-2" draggable="true" ondragstart="m1_handleDragStart(event)">加熱 (直到油熱了)</div>
+                <div class="drag-item" id="step-7" draggable="true" ondragstart="m1_handleDragStart(event)">加入調味料拌勻</div>
+                <div class="drag-item" id="step-4" draggable="true" ondragstart="m1_handleDragStart(event)">快速攪拌 (直到蛋凝固)</div>
+                <div class="drag-item" id="step-6" draggable="true" ondragstart="m1_handleDragStart(event)">翻炒 (直到米飯散開)</div>
+            </div>
+
+            <button class="btn btn-check" onclick="m1_checkOrder()">驗收成果</button>
+            <div id="m1-feedback" class="feedback"></div>
+            <button class="btn btn-next" onclick="showMission('mission-2')" style="display:none;" id="btn-m1-next">前往 Mission 2 ➡️</button>
+        </section>
+
+        <section id="mission-2" class="mission">
+            <h2>Mission 2: 情報排序 <span>(選擇排序法)</span></h2>
+            <p class="mission-intro">
+                <strong>教官：</strong> 「情報員截獲了一批混亂的密碼！如果不排序，我們根本無法使用。你的任務是學習『選擇排序法』，把情報整理乾淨。」
+            </p>
+
+            <h3>任務 2-1: 排序法演示</h3>
+            <p><strong>📖 任務說明：</strong> 觀察「選擇排序法」如何處理這組密碼：[ 8, 5, 10, 1, 7 ]。它會一輪一輪地找出「未排序」中最小的數字，放到「已排序」的末端。</p>
+            <div id="m2-viz-container" class="data-container">
+                </div>
+            <button class="btn" onclick="m2_startVisualization()">開始演示</button>
+            <button class="btn btn-reset" onclick="m2_resetVisualization()">重新演示</button>
+
+            <h3 style="margin-top: 30px;">任務 2-2: 修復 Scratch 程式</h3>
+            <p><strong>📖 任務說明：</strong> 這是「選擇排序法」中「找出最小值位置」的關鍵程式 。但它好像壞了！請找出 <strong>(?)</strong> 應該填入什麼？</p>
+            
+            <div class="scratch-puzzle">
+                <pre>
+  設 [最小值位置] 為 (1)
+  設 [資料位置] 為 (2)
+  重複 (4) 次
+    如果 ( (原始資料 的 第 (資料位置) 項) < (原始資料 的 第 <strong>(?)</strong> 項) ) 那麼
+      設 [最小值位置] 為 (資料位置)
+    改變 [資料位置] (1)
+                </pre>
+                
+                <p><strong>(?)</strong> 應該是：
+                    <select id="m2-quiz-select">
+                        <option value="">請選擇...</option>
+                        <option value="資料位置">資料位置</option>
+                        <option value="最小值位置">最小值位置</option>
+                        <option value="1">1</option>
+                    </select>
+                </p>
+            </div>
+            
+            <button class="btn btn-check" onclick="m2_checkQuiz()">檢查答案</button>
+            <div id="m2-feedback" class="feedback"></div>
+            <button class="btn btn-next" onclick="showMission('mission-3')" style="display:none;" id="btn-m2-next">前往 Mission 3 ➡️</button>
+        </section>
+
+        <section id="mission-3" class="mission">
+            <h2>Mission 3: 鎖定目標 <span>(循序/二元搜尋法)</span></h2>
+            <p class="mission-intro">
+                <strong>教官：</strong> 「情報排好序了，現在我們要快速找出目標！不同的搜尋方式，效率天差地遠。體驗看看吧！」
+            </p>
+
+            <h3>任務 3-1: 循序搜尋法</h3>
+            <p><strong>📖 任務說明：</strong> 在這堆 <strong>未排序</strong> 的彈藥箱 [ 8, 5, 10, 1, 7 ] 中，找出 <strong>10號</strong> 彈藥 。你必須 *從左到右* 依序點擊檢查！</p>
+            <div id="m3-seq-container" class="data-container">
+                </div>
+            <p>你已比較了 <strong id="m3-seq-count">0</strong> 次。</p>
+            <button class="btn btn-reset" onclick="m3_resetSequential()">重設任務</button>
+            <div id="m3-seq-feedback" class="feedback"></div>
+
+            <h3 style="margin-top: 30px;">任務 3-2: 二元搜尋法</h3>
+            <p><strong>📖 任務說明：</strong> 這次彈藥箱 <strong>已排序</strong> [ 1, 5, 7, 8, 10 ]。我們要找出 <strong>10號</strong> 彈藥 [cite: 19, 20]。請跟隨系統的提示，使用「二元搜尋法」（折半搜尋）！</p>
+            <div id="m3-bin-container" class="data-container">
+                </div>
+            <div id="m3-bin-guide">
+                </div>
+            <button class="btn btn-reset" onclick="m3_resetBinary()">重設任務</button>
+            <div id="m3-bin-feedback" class="feedback"></div>
+            
+            <button class="btn btn-next" onclick="showMission('mission-4')" style="display:none;" id="btn-m3-next">前往最終試煉 ➡️</button>
+        </section>
+
+        <section id="mission-4" class="mission">
+            <h2>Mission 4: 最終試煉 <span>(分組合作 - 模擬)</span></h2>
+            <p class="mission-intro">
+                <strong>教官：</strong> 「這是你的畢業考！在真實情境中，排序和搜尋是連貫的。你必須和你的『夥伴』合作解開金庫。由於你的夥伴今天請假... 你得一人分飾兩角！」
+            </p>
+            <p><strong>📖 任務說明：</strong> 
+                <br> <strong>Part 1 (排序)：</strong> 系統會給你一組混亂的密碼。請「點擊」數字，將它們從小到大排序。
+                <br> <strong>Part 2 (搜尋)：</strong> 排序完成後，系統會給你一個「目標密碼」，請使用「二元搜尋法」找出它。
+            </p>
+            
+            <h3>Part 1: 排序密碼</h3>
+            <div id="m4-sort-pool" class="data-container"></div>
+            <p><strong>你的排序結果 (點擊上方數字來排序)：</strong></p>
+            <div id="m4-sort-result" class="data-container" style="min-height: 70px; background: #f9f9f9; border: 1px dashed #ccc;"></div>
+            <button class="btn btn-check" onclick="m4_checkSort()">確認排序</button>
+            <div id="m4-sort-feedback" class="feedback"></div>
+
+            <div id="m4-part2" style="display:none;">
+                <h3 style="margin-top: 30px;">Part 2: 二元搜尋</h3>
+                <p><strong>📖 任務說明：</strong> 排序完成！你的夥伴（系統）告訴你，目標密碼是 <strong id="m4-target-num"></strong>。請用「二元搜尋法」在你的排序結果中找出它！</p>
+                <div id="m4-bin-container" class="data-container">
+                    </div>
+                <div id="m4-bin-guide">
+                    </div>
+                <div id="m4-bin-feedback" class="feedback"></div>
+            </div>
+            
+            <div id="m4-final-feedback" class="feedback" style="text-align:center; font-size: 1.5rem; background: #dff0d8; color: #3c763d;">
+                </div>
+            
+        </section>
+
+    </main>
+
+    <footer>
+        <p>「演算法特務學院」 - 數位學習模組 Demo<br>
+        靈感來源：翰林版八年級資訊科技 (108課綱) 第六章</p>
+    </footer>
+
+    <script>
+        // --- 全局導航 ---
+        function showMission(missionId) {
+            // 隱藏所有任務
+            document.querySelectorAll('.mission').forEach(m => {
+                m.style.display = 'none';
+            });
+            // 顯示指定任務
+            const targetMission = document.getElementById(missionId);
+            if (targetMission) {
+                targetMission.style.display = 'block';
+            }
+        }
+        
+        // 頁面載入時，預設顯示任務1
+        document.addEventListener('DOMContentLoaded', () => {
+            showMission('mission-1');
+            m1_init();
+            m2_init();
+            m3_init();
+            m4_init();
+        });
+
+        // --- 任務 1: 拖曳排序 (蛋炒飯)  ---
+        let m1_draggedItem = null;
+        const m1_correctOrder = ["step-1", "step-2", "step-3", "step-4", "step-5", "step-6", "step-7"];
+
+        function m1_init() {
+            // 重置功能
+            const pool = document.getElementById('item-pool');
+            const zone = document.getElementById('drop-zone');
+            zone.innerHTML = '';
+            document.querySelectorAll('.drag-item').forEach(item => pool.appendChild(item));
+            document.getElementById('m1-feedback').style.display = 'none';
+            document.getElementById('btn-m1-next').style.display = 'none';
+        }
+
+        function m1_handleDragStart(e) {
+            m1_draggedItem = e.target;
+        }
+
+        function m1_handleDrop(e) {
+            e.preventDefault();
+            if (m1_draggedItem) {
+                e.target.closest('#drop-zone').appendChild(m1_draggedItem);
+                m1_draggedItem = null;
+            }
+        }
+
+        function m1_checkOrder() {
+            const dropZone = document.getElementById('drop-zone');
+            const items = dropZone.querySelectorAll('.drag-item');
+            const feedback = document.getElementById('m1-feedback');
+            
+            let userOrder = Array.from(items).map(item => item.id);
+            
+            if (JSON.stringify(userOrder) === JSON.stringify(m1_correctOrder)) {
+                feedback.textContent = '🎉 完美！看來你很有當特務的天賦！蛋炒飯... 啊不是，能量飲完成了！';
+                feedback.className = 'feedback success';
+                document.getElementById('btn-m1-next').style.display = 'inline-block';
+            } else {
+                feedback.textContent = '❌ 步驟錯誤！這個味道...不太對勁。再試一次！';
+                feedback.className = 'feedback error';
+            }
+            feedback.style.display = 'block';
+        }
+
+        // --- 任務 2: 選擇排序法  ---
+        let m2_data = [8, 5, 10, 1, 7];
+        let m2_viz_container = document.getElementById('m2-viz-container');
+
+        function m2_init() {
+            m2_resetVisualization();
+            document.getElementById('m2-feedback').style.display = 'none';
+            document.getElementById('btn-m2-next').style.display = 'none';
+            document.getElementById('m2-quiz-select').value = '';
+        }
+
+        function m2_resetVisualization() {
+            m2_viz_container.innerHTML = '';
+            m2_data.forEach(val => {
+                let box = document.createElement('div');
+                box.className = 'data-box';
+                box.textContent = val;
+                m2_viz_container.appendChild(box);
+            });
+        }
+        
+        // 異步函式，用於演示
+        async function m2_startVisualization() {
+            m2_resetVisualization();
+            let boxes = m2_viz_container.querySelectorAll('.data-box');
+            let n = boxes.length;
+
+            for (let i = 0; i < n - 1; i++) {
+                let minIdx = i;
+                boxes[i].classList.add('highlight-swap'); // 標記當前比較的基準
+                await sleep(800);
+
+                // 找到未排序部分中的最小值
+                for (let j = i + 1; j < n; j++) {
+                    boxes[j].classList.add('highlight-min'); // 標記正在檢查的
+                    await sleep(500);
+                    if (parseInt(boxes[j].textContent) < parseInt(boxes[minIdx].textContent)) {
+                        boxes[minIdx].classList.remove('highlight-min', 'highlight-swap');
+                        minIdx = j;
+                        boxes[minIdx].classList.add('highlight-min'); // 標記新的最小值
+                    } else {
+                        boxes[j].classList.remove('highlight-min');
+                    }
+                }
+                
+                await sleep(800);
+
+                // 交換
+                let temp = boxes[i].textContent;
+                boxes[i].textContent = boxes[minIdx].textContent;
+                boxes[minIdx].textContent = temp;
+
+                // 清除樣式
+                boxes.forEach(box => box.classList.remove('highlight-min', 'highlight-swap'));
+                boxes[i].classList.add('sorted'); // 標記已排序
+            }
+            boxes[n - 1].classList.add('sorted');
+        }
+
+        function m2_checkQuiz() {
+            const answer = document.getElementById('m2-quiz-select').value;
+            const feedback = document.getElementById('m2-feedback');
+            // 對應課本  的邏輯，是要跟當前的「最小值位置」的項目比
+            if (answer === '最小值位置') {
+                feedback.textContent = '🎉 正確！就是要跟當前紀錄的「最小值位置」上的數字比較。程式修復完畢！';
+                feedback.className = 'feedback success';
+                document.getElementById('btn-m2-next').style.display = 'inline-block';
+            } else {
+                feedback.textContent = '❌ 錯誤！再想想看，我們要比較的是「當前項目」和「我們*紀錄*的最小項目」喔。';
+                feedback.className = 'feedback error';
+            }
+            feedback.style.display = 'block';
+        }
+
+
+        // --- 任務 3: 搜尋  ---
+        let m3_seq_data = [8, 5, 10, 1, 7];
+        let m3_seq_target = 10;
+        let m3_seq_count = 0;
+        let m3_seq_found = false;
+
+        let m3_bin_data = [1, 5, 7, 8, 10];
+        let m3_bin_target = 10;
+        
+        function m3_init() {
+            m3_resetSequential();
+            m3_resetBinary();
+            document.getElementById('btn-m3-next').style.display = 'none';
+        }
+
+        // 3-1 循序搜尋
+        function m3_resetSequential() {
+            const container = document.getElementById('m3-seq-container');
+            container.innerHTML = '';
+            m3_seq_count = 0;
+            m3_seq_found = false;
+            document.getElementById('m3-seq-count').textContent = '0';
+            document.getElementById('m3-seq-feedback').style.display = 'none';
+            
+            m3_seq_data.forEach((val, index) => {
+                let box = document.createElement('div');
+                box.className = 'data-box search-target';
+                box.textContent = val;
+                box.onclick = () => m3_checkSequential(box, val, index);
+                container.appendChild(box);
+            });
+        }
+        
+        function m3_checkSequential(box, val, index) {
+            if (m3_seq_found) return; // 找到了就別玩了
+            
+            if (index !== m3_seq_count) {
+                const feedback = document.getElementById('m3-seq-feedback');
+                feedback.textContent = '❌ 探員！你沒有「依序」搜尋！循序搜尋必須從第一個開始。';
+                feedback.className = 'feedback error';
+                feedback.style.display = 'block';
+                return;
+            }
+
+            m3_seq_count++;
+            document.getElementById('m3-seq-count').textContent = m3_seq_count;
+            box.classList.add('highlight-swap'); // 標記檢查過
+
+            const feedback = document.getElementById('m3-seq-feedback');
+            if (val === m3_seq_target) {
+                m3_seq_found = true;
+                feedback.textContent = `🎉 找到了！目標是 ${val}。你總共比較了 ${m3_seq_count} 次。`;
+                feedback.className = 'feedback success';
+                box.classList.add('sorted');
+                document.getElementById('btn-m3-next').style.display = 'inline-block'; // 顯示通往下一關
+            } else {
+                feedback.textContent = `第 ${m3_seq_count} 次： ${val} 不是目標... 繼續找。`;
+                feedback.className = 'feedback';
+            }
+            feedback.style.display = 'block';
+        }
+
+        // 3-2 二元搜尋
+        function m3_resetBinary() {
+            const container = document.getElementById('m3-bin-container');
+            container.innerHTML = '';
+            m3_bin_data.forEach(val => {
+                let box = document.createElement('div');
+                box.className = 'data-box';
+                box.textContent = val;
+                container.appendChild(box);
+            });
+            document.getElementById('m3-bin-feedback').style.display = 'none';
+            m3_startBinarySearch(0, m3_bin_data.length - 1);
+        }
+
+        function m3_startBinarySearch(low, high) {
+            const guide = document.getElementById('m3-bin-guide');
+            const feedback = document.getElementById('m3-bin-feedback');
+            const boxes = document.querySelectorAll('#m3-bin-container .data-box');
+            
+            // 標記當前範圍
+            boxes.forEach((box, i) => {
+                if (i >= low && i <= high) {
+                    box.classList.remove('disabled');
+                } else {
+                    box.classList.add('disabled');
+                }
+            });
+
+            if (low > high) {
+                feedback.textContent = '❌ 範圍內找不到了！任務失敗。';
+                feedback.className = 'feedback error';
+                feedback.style.display = 'block';
+                return;
+            }
+
+            let mid = Math.floor((low + high) / 2);
+            let midVal = m3_bin_data[mid];
+            
+            boxes[mid].classList.add('highlight-min'); // 標記中間值
+
+            guide.innerHTML = `
+                <p>目前搜尋範圍：索引 [${low}] 到 [${high}]。</p>
+                <p>我們檢查中間位置 (索引 ${mid})，數字是 <strong>${midVal}</strong>。</p>
+                <p>目標 <strong>${m3_bin_target}</strong> 比 <strong>${midVal}</strong> ...？</p>
+                <button class="btn" onclick="m3_handleBinaryChoice(${low}, ${high}, ${mid}, 'less')">小</button>
+                <button class="btn" onclick="m3_handleBinaryChoice(${low}, ${high}, ${mid}, 'equal')">等於</button>
+                <button class="btn" onclick="m3_handleBinaryChoice(${low}, ${high}, ${mid}, 'more')">大</button>
+            `;
+        }
+
+        function m3_handleBinaryChoice(low, high, mid, choice) {
+            const midVal = m3_bin_data[mid];
+            const feedback = document.getElementById('m3-bin-feedback');
+            const boxes = document.querySelectorAll('#m3-bin-container .data-box');
+            boxes[mid].classList.remove('highlight-min');
+
+            let correctChoice = '';
+            if (m3_bin_target < midVal) correctChoice = 'less';
+            else if (m3_bin_target > midVal) correctChoice = 'more';
+            else correctChoice = 'equal';
+
+            if (choice !== correctChoice) {
+                feedback.textContent = '❌ 判斷錯誤！再想一下。';
+                feedback.className = 'feedback error';
+                feedback.style.display = 'block';
+                m3_startBinarySearch(low, high); // 重來這一步
+                return;
+            }
+
+            feedback.style.display = 'none'; // 答對，清除錯誤訊息
+
+            if (choice === 'equal') {
+                feedback.textContent = `🎉 找到了！目標就是 ${midVal}！這就是二元搜尋法！`;
+                feedback.className = 'feedback success';
+                feedback.style.display = 'block';
+                boxes[mid].classList.add('sorted');
+                document.getElementById('m3-bin-guide').innerHTML = '';
+            } else if (choice === 'less') {
+                m3_startBinarySearch(low, mid - 1); // 搜尋左半邊
+            } else if (choice === 'more') {
+                m3_startBinarySearch(mid + 1, high); // 搜尋右半邊
+            }
+        }
+
+        // --- 任務 4: 最終試煉 ---
+        let m4_data = [42, 15, 7, 99, 30];
+        let m4_sorted_data = [];
+        let m4_target = 30; // 預設一個在裡面的
+        
+        function m4_init() {
+            const pool = document.getElementById('m4-sort-pool');
+            const result = document.getElementById('m4-sort-result');
+            pool.innerHTML = '';
+            result.innerHTML = '';
+            m4_sorted_data = [];
+            
+            // 隨機生成新數字
+            m4_data = Array.from({length: 5}, () => Math.floor(Math.random() * 100) + 1);
+            m4_target = m4_data[Math.floor(Math.random() * m4_data.length)]; // 確保目標一定在
+            
+            m4_data.forEach(val => {
+                let box = document.createElement('div');
+                box.className = 'data-box search-target';
+                box.textContent = val;
+                box.onclick = () => m4_addToSort(box, val);
+                pool.appendChild(box);
+            });
+            
+            document.getElementById('m4-target-num').textContent = m4_target;
+            document.getElementById('m4-part2').style.display = 'none';
+            document.getElementById('m4-sort-feedback').style.display = 'none';
+            document.getElementById('m4-final-feedback').style.display = 'none';
+        }
+
+        function m4_addToSort(box, val) {
+            m4_sorted_data.push(val);
+            const result = document.getElementById('m4-sort-result');
+            let newBox = document.createElement('div');
+            newBox.className = 'data-box';
+            newBox.textContent = val;
+            result.appendChild(newBox);
+            box.style.display = 'none'; // 從池中隱藏
+        }
+
+        function m4_checkSort() {
+            const feedback = document.getElementById('m4-sort-feedback');
+            let correctSorted = [...m4_data].sort((a, b) => a - b);
+            
+            if (JSON.stringify(m4_sorted_data) === JSON.stringify(correctSorted)) {
+                feedback.textContent = '🎉 排序正確！準備進行 Part 2！';
+                feedback.className = 'feedback success';
+                document.getElementById('m4-part2').style.display = 'block';
+                // 開始Part 2
+                m4_startBinarySearch(0, m4_sorted_data.length - 1);
+            } else {
+                feedback.textContent = '❌ 排序錯誤！請重設並再試一次。';
+                feedback.className = 'feedback error';
+                // 簡易重設
+                m4_init(); 
+            }
+            feedback.style.display = 'block';
+        }
+        
+        // 借用 M3 的二元搜尋邏輯，但操作 M4 的元素
+        function m4_startBinarySearch(low, high) {
+            const guide = document.getElementById('m4-bin-guide');
+            const feedback = document.getElementById('m4-bin-feedback');
+            const container = document.getElementById('m4-bin-container');
+            
+            // 繪製排好序的方塊
+            container.innerHTML = '';
+            m4_sorted_data.forEach(val => {
+                let box = document.createElement('div');
+                box.className = 'data-box';
+                box.textContent = val;
+                container.appendChild(box);
+            });
+            const boxes = container.querySelectorAll('.data-box');
+
+            boxes.forEach((box, i) => {
+                if (i >= low && i <= high) box.classList.remove('disabled');
+                else box.classList.add('disabled');
+            });
+
+            if (low > high) {
+                feedback.textContent = '❌ 咦？你是不是搞錯了？找不到了...';
+                feedback.className = 'feedback error';
+                feedback.style.display = 'block';
+                return;
+            }
+
+            let mid = Math.floor((low + high) / 2);
+            let midVal = m4_sorted_data[mid];
+            
+            boxes[mid].classList.add('highlight-min');
+
+            guide.innerHTML = `
+                <p>搜尋範圍 [${low}] 到 [${high}]。中間 (索引 ${mid}) 是 <strong>${midVal}</strong>。</p>
+                <p>目標 <strong>${m4_target}</strong> 和 <strong>${midVal}</strong> 相比？</p>
+                <button class="btn" onclick="m4_handleBinaryChoice(${low}, ${high}, ${mid}, 'less')">小</button>
+                <button class="btn" onclick="m4_handleBinaryChoice(${low}, ${high}, ${mid}, 'equal')">等於</button>
+                <button class="btn" onclick="m4_handleBinaryChoice(${low}, ${high}, ${mid}, 'more')">大</button>
+            `;
+        }
+
+        function m4_handleBinaryChoice(low, high, mid, choice) {
+            const midVal = m4_sorted_data[mid];
+            const feedback = document.getElementById('m4-bin-feedback');
+            const container = document.getElementById('m4-bin-container');
+            const boxes = container.querySelectorAll('.data-box');
+            
+            let correctChoice = '';
+            if (m4_target < midVal) correctChoice = 'less';
+            else if (m4_target > midVal) correctChoice = 'more';
+            else correctChoice = 'equal';
+
+            if (choice !== correctChoice) {
+                feedback.textContent = '❌ 判斷錯誤！再想一下。';
+                feedback.className = 'feedback error';
+                feedback.style.display = 'block';
+                m4_startBinarySearch(low, high); // 重來這一步
+                return;
+            }
+            
+            feedback.style.display = 'none';
+
+            if (choice === 'equal') {
+                document.getElementById('m4-final-feedback').innerHTML = `
+                🏆 任務完成！ 🏆
+                <p>恭喜你，探員！你已經掌握了演算法的核心！你已順利畢業！</p>
+                <button class="btn btn-next" onclick="location.reload()">重新挑戰學院</button>
+                `;
+                document.getElementById('m4-final-feedback').style.display = 'block';
+                boxes[mid].classList.add('sorted');
+                document.getElementById('m4-bin-guide').innerHTML = '';
+            } else if (choice === 'less') {
+                m4_startBinarySearch(low, mid - 1);
+            } else if (choice === 'more') {
+                m4_startBinarySearch(mid + 1, high);
+            }
+        }
+        
+        // --- 輔助工具 ---
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+    </script>
+</body>
+</html>
